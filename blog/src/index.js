@@ -16,6 +16,7 @@ app.get('/', (req, res) => {
 app.get('/', (req, res) => {
   res.render('news')
 })
+/////
 
 
 app.listen(port, () => {
