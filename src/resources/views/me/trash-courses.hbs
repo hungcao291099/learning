@@ -1,0 +1,127 @@
+<div class="mt-4">
+<h3>Khóa học của tôi</h3>
+<a href="/me/stored/courses">Danh sách khóa học</a>
+  <table class="table">
+    <thead>
+      <tr class="text-center">
+        <th scope="col">#</th>
+        <th scope="col">Tên khóa học</th>
+        <th scope="col">VideoID</th>
+        <th scope="col" colspan="2">Thời gian xóa </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each courses}}
+        <tr>
+          <th scope="row">{{sum @index 1}}</th>
+          <td>{{this.name}}</td>
+          <td>{{this.videoID}}</td>
+          <td>{{this.deletedAt}}</td>
+          <td>
+            <a  class="btn btn-dark btn-restore" data-id="{{this._id}}">Khôi phục</a>
+            <a
+              href=""
+              class="btn btn-danger"
+              data-bs-toggle="modal"
+              data-bs-target="#delete-course-modal"
+              data-id="{{this._id}}">Xóa vĩnh viễn</a>
+            
+
+          </td>
+        </tr>
+      {{else}}
+      <tr>
+        <td colspan="5" class="text-center">
+          Thùng rác trống
+         <a href="/me/stored/courses">Danh sách khóa học</a>
+        </td>
+      </tr>
+      {{/each}}
+      
+   
+    </tbody>
+  </table>
+
+</div>
+
+<!-- delete hidden form -->
+
+<form name="restore-course-form" method="post"></form>
+<form name="delete-course-form" method="post"></form>
+
+
+
+<!-- delete confirm -->
+<!-- Button trigger modal -->
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="delete-course-modal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Xóa khóa học ?</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Bạn chắc chắn muốn xóa khóa học này ?
+      </div>
+      <div class="modal-footer">
+        <button
+          id="btn-delete-course"
+          type="button"
+          class="btn btn-danger"
+          
+        >Xóa bỏ</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!  script }}
+<script >
+  //DOM loaded
+  document.addEventListener("DOMContentLoaded", function(event) { 
+  var courseID;
+  var deleteForm = document.forms['delete-course-form'] ;
+  var restoreForm = document.forms['restore-course-form'] ;
+  var deleteModal = document.getElementById('delete-course-modal')
+  var btnDeleteCourse = document.getElementById('btn-delete-course')
+  var restoreBtn= $('.btn-restore')
+  
+//listener modal
+  deleteModal.addEventListener('show.bs.modal', function (event) { 
+  var button = event.relatedTarget ;
+  courseID = button.getAttribute('data-id')  }) ;
+
+ 
+  
+  // btn delete onclicked
+    btnDeleteCourse.onclick = function () { 
+    deleteForm.action = "/courses/" + courseID + "/force?_method=delete";
+    deleteForm.submit();} 
+     
+   
+    restoreBtn.click(function (event) {
+      event.preventDefault();
+      var courseID = ($(this).data('id'))
+        restoreForm.action = "/courses/" + courseID + "/restore?_method=PATCH";
+       restoreForm.submit();
+    })
+    
+     })
+
+   
+
+</script>
