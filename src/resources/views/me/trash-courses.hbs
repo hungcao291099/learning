@@ -1,6 +1,19 @@
-<div class="mt-4">
+<form class="mt-4" method="POST" action="/courses/handle-form-actions" name="container-form">
 <h3>Khóa học của tôi</h3>
 <a href="/me/stored/courses">Danh sách khóa học</a>
+<div class="mt-4 d-flex align-item-center">
+  <div class="form-check">
+  <input class="form-check-input me-1" type="checkbox" value="" aria-label="..." id="checkbox-all">
+  <label class="form-check-lable me-1" for="checkbox-all">Chọn tất cả</label>
+</div>
+
+  <select class="form-select-md checkbox-sel-all mx-2 mb-1" name="action" required="required">
+  <option selected  value="">--- Chọn hành động ---</option>
+  <option value="restore">Khôi phục</option>
+</select>
+<div  class="btn btn-primary btn-sm disabled check-all-submit" type="submit"  >Thực hiện </div>
+
+</div>
   <table class="table">
     <thead>
       <tr class="text-center">
@@ -13,6 +26,11 @@
     <tbody>
       {{#each courses}}
         <tr>
+          <td>
+          <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="courseIDs[]" value="{{this._id}}">
+          </div>
+          </td>
           <th scope="row">{{sum @index 1}}</th>
           <td>{{this.name}}</td>
           <td>{{this.videoID}}</td>
@@ -42,7 +60,7 @@
     </tbody>
   </table>
 
-</div>
+</form>
 
 <!-- delete hidden form -->
 
@@ -99,7 +117,10 @@
   var deleteModal = document.getElementById('delete-course-modal')
   var btnDeleteCourse = document.getElementById('btn-delete-course')
   var restoreBtn= $('.btn-restore')
-  
+   var checkboxAll = $('#checkbox-all')
+  var courseItemCheckbox = $('input[name="courseIDs[]"]')
+  var checkAllSubmitBtn= $('.check-all-submit')
+  var containerForm= document.forms['container-form']
 //listener modal
   deleteModal.addEventListener('show.bs.modal', function (event) { 
   var button = event.relatedTarget ;
@@ -120,8 +141,49 @@
        restoreForm.submit();
     })
     
+    // btn delete onclicked
+  btnDeleteCourse.onclick = function () { 
+    deleteForm.action = "/courses/" + courseID + "?_method=delete";
+    deleteForm.submit();
+     } 
+  // check-all-submit-btn clicked
+  checkAllSubmitBtn.click( function (event) {
+    
+    var isSubmitable = !$(this).hasClass('disabled') ;
+    if(isSubmitable) {
+      containerForm.submit();
+    }
+    else {event.preventDefault();}
+    
+  })   
+     checkAllSubmitBtn.on('submit', function (event) {
+       var isSubmitable = !$(this).hasClass('disabled') ;
+    if(!isSubmitable){
+      event.preventDefault()
+    }
+     })
+    // checkbox-all change
+     checkboxAll.change( function () {
+     var isCheckedAll = $(this).prop('checked')
+        courseItemCheckbox.prop('checked', isCheckedAll)
+        renderCheckedAll();
      })
 
-   
+    // item checkbox change
+    courseItemCheckbox.change( function () {
+      var CheckedAll = courseItemCheckbox.length === $('input[name="courseIDs[]"]:checked').length
+      checkboxAll.prop('checked', CheckedAll)
+      renderCheckedAll();
+    })
 
+    function renderCheckedAll(){
+      var CheckedCount = $('input[name="courseIDs[]"]:checked').length
+      if(CheckedCount > 0 ) {
+        checkAllSubmitBtn.removeClass('disabled')
+      }
+      else {
+        checkAllSubmitBtn.addClass('disabled')
+      }
+    }
+     })
 </script>
